@@ -1,8 +1,11 @@
 import React from "react";
+import {Modal} from "../components/Modal.tsx";
+import {ValueRow} from "../components/ValueRow.tsx";
+import {Formula} from "../components/Formula.tsx";
 
 function FrictionSimulation() {
   const [showValuesModal, setShowValuesModal] = React.useState(false);
-  const [showFormulsModal, setShowFormulsModal] = React.useState(false);
+  const [showFormulasModal, setShowFormulasModal] = React.useState(false);
   const [showControlsModal, setShowControlsModals] = React.useState(true);
 
   const [surfaceType, setSurfaceType] = React.useState<string>('дерево');
@@ -97,7 +100,7 @@ function FrictionSimulation() {
     }
   }, [isRunning, position, velocity, acceleration]);
 
-  const drawRoundedRect = (ctx, x, y, width, height, radius) => {
+  const drawRoundedRect = (ctx: any, x: number, y: number, width: number, height: number, radius: number) => {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
     ctx.lineTo(x + width - radius, y);
@@ -289,8 +292,8 @@ function FrictionSimulation() {
   };
 
   return (
-    <div className='h-screen w-full bg-gray-100 flex flex-col items-center overflow-hidden'>
-      <div className='relative w-full h-full flex justify-center items-center bg-gray-100'>
+    <div className='min-h-screen w-full bg-gray-100 flex flex-col items-center overflow-hidden'>
+      <div className='relative w-full min-h-screen flex justify-center items-center bg-gray-100 py-8'>
         <canvas
           ref={canvasRef}
           width={canvasWidth}
@@ -301,140 +304,125 @@ function FrictionSimulation() {
         <div className='absolute top-4 right-4 flex gap-2'>
           <button
             onClick={() => setShowValuesModal(!showValuesModal)}
-            className='bg-blue-500 text-white px-3 py-1 rounded-md shadow hover:bg-blue-600 transition'
+            className='bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center space-x-1'
           >
             {showValuesModal ? 'Скрыть значения' : 'Показать значения'}
           </button>
           <button
-            onClick={() => setShowFormulsModal(!showFormulsModal)}
-            className='bg-purple-500 text-white px-3 py-1 rounded-md shadow hover:bg-purple-600 transition'
+            onClick={() => setShowFormulasModal(!showFormulasModal)}
+            className='bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg hover:from-purple-600 hover:purple transition-all duration-300 flex items-center space-x-1'
           >
-            {showFormulsModal ? 'Скрыть формулы' : 'Показать формулы'}
+            {showFormulasModal ? 'Скрыть формулы' : 'Показать формулы'}
           </button>
           <button
             onClick={() => setShowControlsModals(!showControlsModal)}
-            className='bg-green-500 text-white px-3 py-1 rounded-md shadow hover:bg-green-600 transition'
+            className='bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg hover:from-green-600 hover:to-grenn-700 transition-all duration-300 flex items-center space-x-1'
           >
             {showControlsModal ? 'Скрыть управление' : 'Показать управление'}
           </button>
         </div>
 
-        {showValuesModal && (
-          <div className="absolute top-20 left-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-64">
-            <div className="text-lg font-semibold mb-2 text-blue-600">Значения:</div>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span>Масса (m):</span>
-                <span>{mass} кг</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Угол (α):</span>
-                <span>{angle}°</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Коэфф. трения (μ):</span>
-                <span>{frictionCoefficient.toFixed(2)}</span>
-              </div>
-              <div className="border-t border-gray-200 my-1"></div>
-              <div className="flex justify-between">
-                <span>Сила тяжести (G):</span>
-                <span>{gravityForce.toFixed(2)} Н</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Сила реакции опоры(N):</span>
-                <span>{normalForce.toFixed(2)} Н</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Сила трения (Fтр):</span>
-                <span>{frictionForce.toFixed(2)} Н</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Результ. сила (F):</span>
-                <span>{netForce.toFixed(2)} Н</span>
-              </div>
-              <div className="border-t border-gray-200 my-1"></div>
-              <div className="flex justify-between">
-                <span>Ускорение (a):</span>
-                <span>{acceleration.toFixed(2)} м/с²</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Скорость (v):</span>
-                <span>{velocity.toFixed(2)} м/с</span>
-              </div>
-            </div>
-          </div>
-        )}
+        <div className='absolute top-20 left-4 transition-all duration-300 transform'>
+          <Modal
+            title='Измеряемые значения'
+            color='bg-gradient-to-r from-blue-500 to-blue-600'
+            isVisible={showValuesModal}
+            onClose={() => setShowValuesModal(false)}
+          >
+            <div className='w-64 space-y-0.5'>
+              <div className='mb-2 font-medium text-blue-600 border-b pb-1'>Параметры:</div>
+              <ValueRow label='Масса (m)' value={mass} unit='кг' />
+              <ValueRow label='Угол (α)' value={angle} unit='°' />
+              <ValueRow label='Коэфф. трения (µ)' value={frictionCoefficient.toFixed(2)} />
 
-        {showFormulsModal && (
-          <div className="absolute top-20 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-72">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-lg font-semibold text-purple-600">Формулы:</div>
-              <button
-                onClick={() => setShowFormulsModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
-            <div className="space-y-2 text-sm">
-              <div>
-                <div className="font-medium">Сила тяжести:</div>
-                <div className="pl-2 italic">G = m · g</div>
-              </div>
-              <div>
-                <div className="font-medium">Сила реакции опоры:</div>
-                <div className="pl-2 italic">N = m · g · cos(α)</div>
-              </div>
-              <div>
-                <div className="font-medium">Составляющая силы тяжести вдоль наклонной:</div>
-                <div className="pl-2 italic">G<sub>х</sub> = m · g · sin(α)</div>
-              </div>
-              <div>
-                <div className="font-medium">Сила трения:</div>
-                <div className="pl-2 italic">F<sub>тр</sub> = μ · N</div>
-                <div className="pl-2 italic">F<sub>тр</sub> = μ · m · g · cos(α)</div>
-              </div>
-              <div>
-                <div className="font-medium">Результирующая сила:</div>
-                <div className="pl-2 italic">F = G<sub>х</sub> - F<sub>тр</sub></div>
-                <div className="pl-2 italic">F = m · g · sin(α) - μ · m · g · cos(α)</div>
-              </div>
-              <div>
-                <div className="font-medium">Условие покоя тела:</div>
-                <div className="pl-2 italic">F<sub>тр</sub> ≥ G<sub>х</sub></div>
-                <div className="pl-2 italic">μ · m · g · cos(α) ≥ m · g · sin(α)</div>
-                <div className="pl-2 italic">μ ≥ tg(α)</div>
-              </div>
-              <div>
-                <div className="font-medium">Ускорение:</div>
-                <div className="pl-2 italic">a = F / m</div>
-                <div className="pl-2 italic">a = g · sin(α) - μ · g · cos(α)</div>
-              </div>
-              <div>
-                <div className="font-medium">Скорость:</div>
-                <div className="pl-2 italic">v = v<sub>0</sub> + a · t</div>
-              </div>
-              <div>
-                <div className="font-medium">Перемещение:</div>
-                <div className="pl-2 italic">s = v<sub>0</sub> · t + (a · t²) / 2</div>
-              </div>
-            </div>
-          </div>
-        )}
+              <div className='my-2 font-medium text-blue-600 border-b pb-1 pt-2'>Силы:</div>
+              <ValueRow label='Сила тяжести (G)' value={gravityForce.toFixed(2)} unit=' H' />
+              <ValueRow label='Сила реакции опоры (N)' value={normalForce.toFixed(2)} unit=' H' />
+              <ValueRow label='Сила трения (Fр)' value={frictionForce.toFixed(2)} unit=' H' />
+              <ValueRow label='Результирующая сила (F)' value={netForce.toFixed(2)} unit=' H' />
 
-        {showControlsModal && (
-          <div className="absolute bottom-4 left-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-96">
-            <div className="text-lg font-semibold mb-3 text-green-600">Управление симуляцией:</div>
+              <div className='my-2 font-medium text-blue-600 border-b pb-1 pt-2'>Кинематика:</div>
+              <ValueRow label='Ускорение (a)' value={acceleration.toFixed(2)} unit=' м/с²' />
+              <ValueRow label='Скорость (v)' value={velocity.toFixed(2)} unit=' м/с' />
+            </div>
+          </Modal>
+        </div>
 
-            <div className="space-y-3">
+        <div className='absolute top-20 right-4 transition-all duration-300 transform'>
+          <Modal
+            title='Основные формулы'
+            color='bg-gradient-to-r from-purple-500 to-purple-600'
+            isVisible={showFormulasModal}
+            onClose={() => setShowFormulasModal(false)}
+          >
+            <div className='w-72 space-y-1'>
+              <Formula
+                title='Сила тяжести'
+                formulas={["G = m * g"]}
+              />
+              <Formula
+                title="Сила реакции опоры"
+                formulas={["N = m · g · cos(α)"]}
+              />
+              <Formula
+                title="Составляющая силы тяжести вдоль наклонной"
+                formulas={["Gх = m · g · sin(α)"]}
+              />
+              <Formula
+                title="Сила трения"
+                formulas={[
+                  "Fтр = μ · N",
+                  "Fтр = μ · m · g · cos(α)"
+                ]}
+              />
+              <Formula
+                title="Результирующая сила"
+                formulas={[
+                  "F = Gх - Fтр",
+                  "F = m · g · sin(α) - μ · m · g · cos(α)"
+                ]}
+              />
+              <Formula
+                title="Условие покоя тела"
+                formulas={[
+                  "Fтр ≥ Gх",
+                  "μ · m · g · cos(α) ≥ m · g · sin(α)",
+                  "μ ≥ tg(α)"
+                ]}
+              />
+              <Formula
+                title='Ускорение'
+                formulas={[
+                  "a = F / m",
+                  "a = g · sin(α) - μ · g · cos(α)"
+                ]}
+              />
+              <Formula
+                title='Скорость'
+                formulas={["v = v₀ + a · t"]}
+              />
+              <Formula
+                title='Перемещение'
+                formulas={["S = v₀ · t + (a · t²) / 2"]}
+              />
+            </div>
+          </Modal>
+        </div>
+
+        <div className='absolute bottom-4 right-4 transition-all duration-300'>
+          <Modal
+            title='Управление симуляцией'
+            color='bg-gradient-to-r from-green-500 to-green-600'
+            isVisible={showControlsModal}
+            onClose={() => setShowControlsModals(false)}
+          >
+            <div className='w-80 space-y-3'>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Тип поверхности:</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Тип поверхности:</label>
                 <select
                   value={surfaceType}
                   onChange={(e) => setSurfaceType(e.target.value)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                  className="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition-all"
                   disabled={isRunning}
                 >
                   <option value="лёд">Лёд (μ = 0.05)</option>
@@ -446,9 +434,12 @@ function FrictionSimulation() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Масса тела (кг): {mass}
-                </label>
+                <div className="flex justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Масса тела:
+                  </label>
+                  <span className="font-medium text-green-600">{mass} кг</span>
+                </div>
                 <input
                   type="range"
                   min="0.1"
@@ -456,15 +447,22 @@ function FrictionSimulation() {
                   step="0.1"
                   value={mass}
                   onChange={(e) => setMass(parseFloat(e.target.value))}
-                  className="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="mt-1 w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-green-500"
                   disabled={isRunning}
                 />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0.1 кг</span>
+                  <span>10 кг</span>
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Угол наклона (°): {angle}
-                </label>
+                <div className="flex justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Угол наклона:
+                  </label>
+                  <span className="font-medium text-green-600">{angle}°</span>
+                </div>
                 <input
                   type="range"
                   min="0"
@@ -472,32 +470,36 @@ function FrictionSimulation() {
                   step="1"
                   value={angle}
                   onChange={(e) => setAngle(parseInt(e.target.value))}
-                  className="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="mt-1 w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-green-500"
                   disabled={isRunning}
                 />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0°</span>
+                  <span>30°</span>
+                </div>
               </div>
 
-              <div className="flex justify-center space-x-4 pt-2">
+              <div className='flex justify-center space-x-2 pt-1'>
                 <button
                   onClick={() => setIsRunning(!isRunning)}
-                  className={`px-4 py-2 rounded-md shadow transition ${
+                  className={`px-4 py-2 text-sm rounded-lg shadow-md hover:cursor-pointer transition-all duration-300 font-medium ${
                     isRunning
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : 'bg-green-500 hover:bg-green-600 text-white'
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white'
+                      : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
                   }`}
                 >
                   {isRunning ? 'Пауза' : 'Запустить'}
                 </button>
                 <button
                   onClick={resetSimulation}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md shadow hover:bg-gray-600 transition"
+                  className='bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 hover:cursor-pointer text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 font-medium'
                 >
                   Сбросить
                 </button>
               </div>
             </div>
-          </div>
-        )}
+          </Modal>
+        </div>
       </div>
     </div>
   )
