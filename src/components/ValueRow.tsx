@@ -2,7 +2,7 @@ import React from "react";
 
 interface Props {
   label: string;
-  value: number;
+  value: string | number;
   unit?: string;
 }
 
