@@ -2,11 +2,13 @@ import React from "react";
 import {Modal} from "../components/Modal.tsx";
 import {ValueRow} from "../components/ValueRow.tsx";
 import {Formula} from "../components/Formula.tsx";
+import {VideoSheet} from "../components/VideoSheet.tsx";
 
 function FrictionSimulation() {
   const [showValuesModal, setShowValuesModal] = React.useState(false);
   const [showFormulasModal, setShowFormulasModal] = React.useState(false);
   const [showControlsModal, setShowControlsModals] = React.useState(true);
+  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   const [surfaceType, setSurfaceType] = React.useState<string>('дерево');
   const [mass, setMass] = React.useState<number>(1);
@@ -222,26 +224,26 @@ function FrictionSimulation() {
 
       const normalScale = 2;
       drawArrow({
-        ctx: ctx,
-        fromX: centerX,
-        fromY: centerY,
-        toX: centerX + Math.sin(angleRad) * normalForce * normalScale,
-        toY: centerY - Math.cos(angleRad) * normalForce * normalScale,
-        color: '#3498db',
-        label: 'N'
+          ctx: ctx,
+          fromX: centerX,
+          fromY: centerY,
+          toX: centerX + Math.sin(angleRad) * normalForce * normalScale,
+          toY: centerY - Math.cos(angleRad) * normalForce * normalScale,
+          color: '#3498db',
+          label: 'N'
         }
       );
 
       if (velocity !== 0 || acceleration !== 0) {
         const frictionScale = 2;
         drawArrow({
-          ctx: ctx,
-          fromX: centerX,
-          fromY: centerY,
-          toX: centerX - Math.cos(angleRad) * frictionForce * frictionScale * 2,
-          toY: centerY - Math.sin(angleRad) * frictionForce * frictionScale * 2,
-          color: '#e67e22',
-          label: 'Fтр'
+            ctx: ctx,
+            fromX: centerX,
+            fromY: centerY,
+            toX: centerX - Math.cos(angleRad) * frictionForce * frictionScale * 2,
+            toY: centerY - Math.sin(angleRad) * frictionForce * frictionScale * 2,
+            color: '#e67e22',
+            label: 'Fтр'
           }
         );
       }
@@ -293,6 +295,7 @@ function FrictionSimulation() {
 
   return (
     <div className='min-h-screen w-full bg-gray-100 flex flex-col items-center overflow-hidden'>
+      <VideoSheet isOpen={isSheetOpen} onClose={() => setIsSheetOpen(false)} />
       <div className='relative w-full min-h-screen flex justify-center items-center bg-gray-100 py-8'>
         <canvas
           ref={canvasRef}
@@ -302,6 +305,12 @@ function FrictionSimulation() {
         />
 
         <div className='absolute top-4 right-4 flex gap-2'>
+          <button
+            onClick={() => setIsSheetOpen(true)}
+            className='bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center space-x-1'
+          >
+            Обучающий контент
+          </button>
           <button
             onClick={() => setShowValuesModal(!showValuesModal)}
             className='bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center space-x-1'
