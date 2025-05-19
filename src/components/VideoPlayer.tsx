@@ -41,6 +41,10 @@ export const VideoPlayer: React.FC = () => {
       const rect = progressBarRef.current.getBoundingClientRect();
       const pos = (e.clientX - rect.left) / rect.width;
       videoRef.current.currentTime = pos * videoRef.current.duration;
+
+      if (videoEnded && pos < 0.99) {
+        setVideoEnded(false);
+      }
     }
   }
 
@@ -49,6 +53,10 @@ export const VideoPlayer: React.FC = () => {
       const currentProgress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(currentProgress);
       setCurrentTime(videoRef.current.currentTime);
+
+      if (videoEnded && !isVideoEnded(videoRef.current.currentTime, videoRef.current.duration)) {
+        setVideoEnded(false);
+      }
     }
   }
 
@@ -111,7 +119,7 @@ export const VideoPlayer: React.FC = () => {
       case 'Escape':
         // Escape для возврата на главную
         showKeyInfo("Возврат на главную");
-        setTimeout(() => onBackToHome(), 500);
+        setTimeout(() => navigate(), 500);
         break;
       default:
         break;
@@ -145,6 +153,10 @@ export const VideoPlayer: React.FC = () => {
     if (videoRef.current) {
       videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
       showKeyInfo("Перемотка на 10 сек. назад");
+
+      if (videoEnded) {
+        setVideoEnded(false);
+      }
     }
   };
 
@@ -213,12 +225,19 @@ export const VideoPlayer: React.FC = () => {
     }
   }, [playbackSpeed]);
 
+  const isVideoEnded = (current: number, total: number): boolean => {
+    const THRESHOLD = 0.1;
+    return current >= total - THRESHOLD && total > 0;
+  };
+
   React.useEffect(() => {
-    if (currentTime === duration && duration > 0) {
+    if (isVideoEnded(currentTime, duration)) {
       setIsPlaying(false);
       setVideoEnded(true);
+    } else if (videoEnded && currentTime < duration - 1) {
+      setVideoEnded(false);
     }
-  }, [currentTime]);
+  }, [currentTime, duration, videoEnded]);
 
   React.useEffect(() => {
     setVideoEnded(false);
@@ -228,13 +247,17 @@ export const VideoPlayer: React.FC = () => {
 
   return (
     <div
-      className='relative w-full h-screen bg-black overflow-hidden'
+      className={`relative w-full h-screen overflow-hidden transition-all duration-700 ${
+        videoEnded ? 'bg-gradient-to-b from-black to-gray-900' : 'bg-black'
+      }`}
       onMouseMove={handleMouseMove}
     >
       <video
         ref={videoRef}
         src={video?.link}
-        className='w-full h-full object-contain'
+        className={`w-full h-full object-contain transition-opacity duration-700 ${
+          videoEnded ? 'opacity-40' : 'opacity-100'
+        }`}
         onClick={togglePlay}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
@@ -245,7 +268,7 @@ export const VideoPlayer: React.FC = () => {
       `}>
         <div className="flex items-center justify-between">
           <Link to='/'>
-            <button className="bg-black/50 hover:bg-black/70 text-white cursor-pointer p-2 rounded-full transition-all">
+            <button className="bg-black/50 hover:bg-black/70 hover:text-red-500 text-white cursor-pointer p-2 rounded-full transition-all">
               <Home size={24} />
             </button>
           </Link>
